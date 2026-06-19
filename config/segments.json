@@ -1,0 +1,25 @@
+{
+  "makes": [
+    "TOYOTA", "HONDA", "NISSAN", "MAZDA", "MITSUBISHI", "SUBARU", "SUZUKI",
+    "DAIHATSU", "ISUZU", "LEXUS", "INFINITI", "ACURA", "SCION",
+    "HINO", "FUSO", "UD TRUCKS",
+    "BMW", "MERCEDES-BENZ", "VOLKSWAGEN", "AUDI", "FORD", "CHEVROLET",
+    "LAND ROVER", "JEEP", "VOLVO", "PEUGEOT", "RENAULT", "CITROEN",
+    "HYUNDAI", "KIA", "SSANGYONG", "DAEWOO",
+    "MINI", "PORSCHE", "FERRARI", "LAMBORGHINI", "MASERATI",
+    "OTHER"
+  ],
+  "year_range": {
+    "start": 1990,
+    "end": 2025
+  },
+  "price_bands_jpy": [
+    [0,       500000],
+    [500000,  1000000],
+    [1000000, 2000000],
+    [2000000, 4000000],
+    [4000000, 99999999]
+  ],
+  "max_pages_per_segment": 20,
+  "page_size": 20
+}

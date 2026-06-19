@@ -1,0 +1,48 @@
+name: Daily Car Scraper
+
+on:
+  schedule:
+    - cron: "0 2 * * *"   # 2 AM UTC = 2 PM NZT daily
+  workflow_dispatch:
+    inputs:
+      site:
+        description: "Site name (leave blank for all)"
+        required: false
+      make:
+        description: "Make to scrape (leave blank for all)"
+        required: false
+      year:
+        description: "Year to scrape (leave blank for all)"
+        required: false
+
+jobs:
+  scrape:
+    name: "Chunk ${{ matrix.chunk }} / 7"
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false        # if one chunk fails, others keep running
+      matrix:
+        chunk: [0, 1, 2, 3, 4, 5, 6]   # 7 parallel workers
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run scraper (chunk ${{ matrix.chunk }})
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+        run: |
+          python scraper.py \
+            --chunk ${{ matrix.chunk }} \
+            --total-chunks 7 \
+            ${{ github.event.inputs.site && format('--site "{0}"', github.event.inputs.site) || '' }} \
+            ${{ github.event.inputs.make && format('--make {0}', github.event.inputs.make) || '' }} \
+            ${{ github.event.inputs.year && format('--year {0}', github.event.inputs.year) || '' }}

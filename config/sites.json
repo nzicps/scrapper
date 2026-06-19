@@ -1,0 +1,26 @@
+[
+  {
+    "name": "SBT Japan",
+    "base_url": "https://www.sbtjapan.com",
+    "search_url": "https://www.sbtjapan.com/used-cars/search?s=-pv&inventory_location=36&page={page}",
+    "adapter": "sbtjapan",
+    "max_pages": 5,
+    "enabled": true
+  },
+  {
+    "name": "BE FORWARD",
+    "base_url": "https://www.beforward.jp",
+    "search_url": "https://www.beforward.jp/stocklist/page:{page}/",
+    "adapter": "beforward",
+    "max_pages": 5,
+    "enabled": true
+  },
+  {
+    "name": "Car From Japan",
+    "base_url": "https://carfromjapan.com",
+    "search_url": "https://carfromjapan.com/cheap-used-japanese-cars?page={page}",
+    "adapter": "carfromjapan",
+    "max_pages": 5,
+    "enabled": true
+  }
+]
