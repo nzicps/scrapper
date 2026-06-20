@@ -21,6 +21,6 @@
     "search_url": "https://carfromjapan.com/cheap-used-japanese-cars?page={page}",
     "adapter": "carfromjapan",
     "max_pages": 5,
-    "enabled": true
+    "enabled": false
   }
 ]
