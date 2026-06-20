@@ -1,4 +1,4 @@
-﻿from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup
 from scrapers.base import BaseAdapter, Car
 import re
 
@@ -39,26 +39,65 @@ class Adapter(BaseAdapter):
         soup = BeautifulSoup(html, "html.parser")
         cars = []
         seen = set()
-        for link in soup.find_all("a", href=re.compile(r"/[a-z\-]+/[A-Z0-9]+\.html")):
+
+        for row in soup.find_all("div", class_=re.compile(r"^stocklist-row")):
+            link = row.find("a", class_="vehicle-url-link")
+            if not link:
+                continue
             href = link.get("href", "")
-            if href in seen or "stocklist" in href:
+            if not href or href in seen:
                 continue
             seen.add(href)
-            container = link.find_parent(class_=re.compile("item|card|product|listing"))
-            if not container:
-                continue
-            title = link.get_text(strip=True)
+
+            full_url = "https://www.beforward.jp" + href if href.startswith("/") else href
+
+            # Stock ID: prefer the numeric /id/<digits>/ segment, fall back to the slug code
+            id_match = re.search(r"/id/(\d+)/", href)
+            if id_match:
+                stock_id = id_match.group(1)
+            else:
+                slug_match = re.search(r"/([a-z0-9]+)/id/", href, re.I)
+                stock_id = slug_match.group(1) if slug_match else href.rstrip("/").split("/")[-1]
+
+            title_el = row.find("p", class_="make-model")
+            title = title_el.get_text(separator=" ", strip=True) if title_el else ""
+            title = re.sub(r"\s+", " ", title).strip()
             if not title or len(title) < 5:
                 continue
-            price_el = container.find(class_=re.compile("price|amount"))
+
+            price_el = row.find("span", class_="price")
             price_raw = price_el.get_text(strip=True) if price_el else ""
-            stock_id = re.search(r"/([A-Z0-9]+)\.html", href)
-            stock_id = stock_id.group(1) if stock_id else href.split("/")[-1]
-            full_url = "https://www.beforward.jp" + href if href.startswith("/") else href
-            img = container.find("img")
-            image_url = (img.get("src") or img.get("data-src")) if img else None
-            car = Car(source=self.name, source_url=full_url, stock_id=stock_id,
-                      title=title, price_jpy=self.clean_price(price_raw), image_url=image_url)
+
+            def spec_value(spec_name):
+                td = row.find("td", class_=re.compile(spec_name))
+                if not td:
+                    return ""
+                val_el = td.find("p", class_="val")
+                return val_el.get_text(strip=True) if val_el else ""
+
+            mileage_raw = spec_value("mileage")
+            engine_raw = spec_value("engine")
+            transmission = spec_value("trans")
+
+            img = row.find("img")
+            image_url = None
+            if img:
+                src = img.get("src") or img.get("data-src")
+                if src:
+                    image_url = "https:" + src if src.startswith("//") else src
+
+            car = Car(
+                source=self.name,
+                source_url=full_url,
+                stock_id=stock_id,
+                title=title,
+                price_jpy=self.clean_price(price_raw),
+                mileage_km=self.clean_int(mileage_raw),
+                engine_cc=self.clean_int(engine_raw),
+                transmission=transmission or None,
+                image_url=image_url,
+            )
             car.parse_title()
             cars.append(car)
+
         return cars
