@@ -22,5 +22,13 @@
     "adapter": "carfromjapan",
     "max_pages": 5,
     "enabled": false
+  },
+  {
+    "name": "Turners NZ",
+    "base_url": "https://www.turners.co.nz",
+    "search_url": "https://www.turners.co.nz/Cars/Used-Cars-for-Sale/?page={page}",
+    "adapter": "turners",
+    "max_pages": 5,
+    "enabled": true
   }
 ]
