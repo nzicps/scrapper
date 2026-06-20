@@ -1,0 +1,37 @@
+name: NZ Car Scraper (Turners)
+
+on:
+  schedule:
+    - cron: "0 3,15 * * *"   # 3 AM and 3 PM UTC (offset from Japan scraper)
+  workflow_dispatch:
+    inputs:
+      make:
+        description: "Make to scrape (leave blank for all)"
+        required: false
+
+jobs:
+  scrape-nz:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install Python dependencies
+        run: pip install -r requirements.txt playwright
+
+      - name: Install Playwright browsers
+        run: playwright install chromium --with-deps
+
+      - name: Run Turners scraper
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+        run: |
+          python scrape_nz.py \
+            ${{ github.event.inputs.make && format('--make "{0}"', github.event.inputs.make) || '' }}
