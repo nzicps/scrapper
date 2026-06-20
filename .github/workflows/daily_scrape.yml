@@ -2,7 +2,7 @@ name: Daily Car Scraper
 
 on:
   schedule:
-    - cron: "0 2 * * *"   # 2 AM UTC = 2 PM NZT daily
+    - cron: "0 2,14 * * *"   # 2 AM UTC = 2 PM NZT daily
   workflow_dispatch:
     inputs:
       site:
